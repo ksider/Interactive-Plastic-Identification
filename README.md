@@ -1,4 +1,4 @@
-# Interactive Polymer Flow Map (Source Package)
+# Interactive Plastic Identification
 
 This directory contains a modularised version of the polymer identification tool, ready to be published as a standalone open-source repository. Markup, styles, application logic, translations, and third-party snippets now live in separate files for easier maintenance.
 
