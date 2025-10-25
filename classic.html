@@ -1,0 +1,2007 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Интерактивная идентификация пластиков</title>
+  <style>
+    :root {
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --border: #d0d7e2;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      margin: 0;
+    }
+
+    .lead {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .top-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .top-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .top-link::before {
+      content: ' ';
+      font-size: 0.85rem;
+    }
+
+    .top-link:hover,
+    .top-link:focus-visible {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .lang-button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .lang-button.active {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .lang-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .question-context {
+      margin-bottom: 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 14px;
+    }
+
+    .option-button {
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      background: var(--accent-soft);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .option-button:hover,
+    .option-button:focus {
+      outline: none;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 18px rgba(37, 99, 235, 0.15);
+      border-color: var(--accent);
+    }
+
+    .option-label {
+      font-weight: 600;
+    }
+
+    .option-note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .ghost-button {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .ghost-button:hover,
+    .ghost-button:focus {
+      outline: none;
+      background: #e2e8f0;
+      border-color: #94a3b8;
+    }
+
+    .history-card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .history-placeholder {
+      margin: 0;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .history-list {
+      list-style: decimal inside;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 14px;
+      color: var(--muted);
+    }
+
+    .history-item strong {
+      display: block;
+      color: var(--text);
+      margin-top: 4px;
+      font-size: 0.98rem;
+    }
+
+    .material-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .material-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      background: #f8fafc;
+    }
+
+    .material-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .material-prop {
+      margin: 4px 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .material-prop span {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 22px;
+      }
+
+      .option-button {
+        padding: 12px 14px;
+      }
+
+      .material-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="header">
+      <h1 id="headline"></h1>
+      <div class="lang-switcher" role="group" aria-label="Language selector">
+        <button type="button" class="lang-button" data-lang="ru">Русский</button>
+        <button type="button" class="lang-button" data-lang="en">English</button>
+      </div>
+    </div>
+    <p id="lead" class="lead"></p>
+    <div class="top-links">
+      <a class="top-link" id="mapLink" href="/polymers">Перейти к интерактивной карте</a>
+      <a class="top-link" id="classicSourceLink" href="https://www.stanmech.com/articles/plastics-identification-flow-chart#:~:text=Plastics%20Identification%20Flow%20Chart%20-%20Articles,Roofing" target="_blank" rel="noopener noreferrer">Source</a>
+    </div>
+
+    <section id="content" class="card"></section>
+    <section id="history" class="card history-card"></section>
+  </main>
+
+  <script>
+    const supportedLanguages = ['ru', 'en'];
+
+    const uiText = {
+      pageTitle: {
+        ru: 'Интерактивная идентификация пластиков',
+        en: 'Interactive Plastic Identification'
+      },
+      heading: {
+        ru: 'Интерактивная идентификация пластиков',
+        en: 'Interactive Plastic Identification'
+      },
+      lead: {
+        ru: 'Следуйте шагам блок-схемы: отвечайте на вопросы и сравнивайте наблюдения, чтобы сузить круг подходящих материалов. В любой момент можно вернуться на шаг назад или начать заново.',
+        en: 'Follow the flowchart: answer the questions and compare your observations to narrow down possible plastics. You can step back or restart at any moment.'
+      },
+      historyHeading: {
+        ru: 'Пройденный путь',
+        en: 'Path Taken'
+      },
+      historyPlaceholder: {
+        ru: 'Ответы появятся после выбора первого варианта.',
+        en: 'Your answers will appear after you make the first choice.'
+      },
+      back: {
+        ru: 'Назад',
+        en: 'Back'
+      },
+      reset: {
+        ru: 'Начать заново',
+        en: 'Start over'
+      },
+      answerLabel: {
+        ru: 'Ответ:',
+        en: 'Answer:'
+      },
+      errorLoading: {
+        ru: 'Не удалось загрузить следующий шаг.',
+        en: 'Failed to load the next step.'
+      },
+      languageSwitcher: {
+        ru: 'Переключатель языка',
+        en: 'Language selector'
+      },
+      mapLink: {
+        ru: 'Перейти к интерактивной карте',
+        en: 'Open interactive map version'
+      },
+      sourceLink: {
+        ru: 'Источник',
+        en: 'Source'
+      }
+    };
+
+    const flow = {
+      start: {
+        type: 'question',
+        title: {
+          ru: 'Пластиковый материал',
+          en: 'Plastic Material'
+        },
+        text: {
+          ru: 'Прижмите к образцу нагретый металлический наконечник. Размягчается ли материал?',
+          en: 'Press a heated metal tip against the sample. Does the material soften?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Да, размягчается',
+              en: 'Yes, it softens'
+            },
+            note: {
+              ru: 'Термопласт',
+              en: 'Thermoplastic'
+            },
+            next: 'thermoplastic_water'
+          },
+          {
+            label: {
+              ru: 'Нет, не размягчается',
+              en: 'No, it does not soften'
+            },
+            note: {
+              ru: 'Термореактивный пластик',
+              en: 'Thermosetting plastic'
+            },
+            next: 'thermoset_burn'
+          }
+        ]
+      },
+      thermoplastic_water: {
+        type: 'question',
+        title: {
+          ru: 'Термопласт',
+          en: 'Thermoplastic'
+        },
+        text: {
+          ru: 'Бросьте маленький образец в воду. Он плавает или тонет?',
+          en: 'Drop a small sample into water. Does it float or sink?'
+        },
+        description: {
+          ru: 'Этот шаг разделяет полиолефины (обычно легче воды) и остальные термопласты.',
+          en: 'This separates lighter-than-water polyolefins from other thermoplastics.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Плавает',
+              en: 'Floats'
+            },
+            note: {
+              ru: 'Полиолефины',
+              en: 'Polyolefins'
+            },
+            next: 'polyolefins_smell'
+          },
+          {
+            label: {
+              ru: 'Тонет',
+              en: 'Sinks'
+            },
+            note: {
+              ru: 'Другие термопласты',
+              en: 'All other thermoplastics'
+            },
+            next: 'thermoplastic_burn_flame'
+          }
+        ]
+      },
+      polyolefins_smell: {
+        type: 'question',
+        title: {
+          ru: 'Полиолефины',
+          en: 'Polyolefins'
+        },
+        text: {
+          ru: 'При сжигании небольшого образца какой запах вы ощущаете?',
+          en: 'When burning a small sample, what odour do you notice?'
+        },
+        description: {
+          ru: 'Полиэтилен, полипропилен и TPX дают схожее пламя, поэтому запах и внешний вид образца помогают их отличить.',
+          en: 'Polyethylene, polypropylene, and TPX show similar flames, so odour and specimen appearance help tell them apart.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Парафин, тёплый запах свечи',
+              en: 'Paraffin, warm candle smell'
+            },
+            next: 'pe'
+          },
+          {
+            label: {
+              ru: 'Едкий, похож на дизельное топливо',
+              en: 'Acrid, like diesel fumes'
+            },
+            next: 'pp'
+          },
+          {
+            label: {
+              ru: 'Запаха почти нет, образец абсолютно прозрачный',
+              en: 'Hardly any smell, sample is completely clear'
+            },
+            next: 'tpx'
+          }
+        ]
+      },
+      pe: {
+        type: 'result',
+        title: {
+          ru: 'Полиэтилен (PE)',
+          en: 'Polyethylene (PE)'
+        },
+        description: {
+          ru: 'Типичный представитель плавающих полиолефинов.',
+          en: 'Representative of floating polyolefins.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Полиэтилен (PE)',
+              en: 'Polyethylene (PE)'
+            },
+            flame: {
+              ru: 'Синее пламя с жёлтым кончиком',
+              en: 'Blue flame with yellow tip'
+            },
+            odour: {
+              ru: 'Парафин, свеча',
+              en: 'Paraffin, candle-like'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Легко царапается ногтем',
+              en: 'Scratches easily with a fingernail'
+            }
+          }
+        ]
+      },
+      pp: {
+        type: 'result',
+        title: {
+          ru: 'Полипропилен (PP)',
+          en: 'Polypropylene (PP)'
+        },
+        description: {
+          ru: 'Плотность чуть меньше единицы, поэтому образец плавает.',
+          en: 'Density is slightly below water, so the sample floats.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Полипропилен (PP)',
+              en: 'Polypropylene (PP)'
+            },
+            flame: {
+              ru: 'Синее пламя с жёлтым кончиком',
+              en: 'Blue flame with yellow tip'
+            },
+            odour: {
+              ru: 'Едкий, дизельный',
+              en: 'Acrid, diesel-like'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Не царапается ногтем',
+              en: 'Does not scratch with a fingernail'
+            }
+          }
+        ]
+      },
+      tpx: {
+        type: 'result',
+        title: {
+          ru: 'Полиметилпентен (TPX)',
+          en: 'Polymethylpentene (TPX)'
+        },
+        description: {
+          ru: 'Прозрачный полиолефин с очень низкой плотностью.',
+          en: 'Transparent polyolefin with very low density.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Polymethylpentene (TPX)',
+              en: 'Polymethylpentene (TPX)'
+            },
+            flame: {
+              ru: 'Синее пламя',
+              en: 'Blue flame'
+            },
+            odour: {
+              ru: 'Практически отсутствует',
+              en: 'Almost odourless'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Прозрачный «стеклянный» вид',
+              en: 'Crystal-clear “glassy” appearance'
+            }
+          }
+        ]
+      },
+      thermoplastic_burn_flame: {
+        type: 'question',
+        title: {
+          ru: 'Другие термопласты',
+          en: 'Other Thermoplastics'
+        },
+        text: {
+          ru: 'При поджигании образца появляется пламя?',
+          en: 'Does the sample produce a flame when ignited?'
+        },
+        description: {
+          ru: 'Наблюдение за пламенем помогает отделить фторполимеры от остальных материалов.',
+          en: 'Flame behaviour separates fluoropolymers from other materials.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Нет, пламени нет',
+              en: 'No flame appears'
+            },
+            next: 'no_flames_drips'
+          },
+          {
+            label: {
+              ru: 'Да, пламя есть',
+              en: 'Yes, a flame appears'
+            },
+            next: 'flame_present'
+          }
+        ]
+      },
+      no_flames_drips: {
+        type: 'question',
+        title: {
+          ru: 'Без пламени',
+          en: 'No Flame'
+        },
+        text: {
+          ru: 'Материал плавится и образует мягкие капли или нити?',
+          en: 'Does the material melt and form soft drips or strings?'
+        },
+        description: {
+          ru: 'Даже если пламени нет, поведение расплава подсказывает, какой именно фторполимер перед вами.',
+          en: 'Even without a flame, melt behaviour hints at the specific fluoropolymer.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Да, образуются капли или нити',
+              en: 'Yes, drips or strings form'
+            },
+            next: 'ctfe'
+          },
+          {
+            label: {
+              ru: 'Нет, материал почти не меняет форму',
+              en: 'No, the shape barely changes'
+            },
+            next: 'fluoro_polymers'
+          }
+        ]
+      },
+      ctfe: {
+        type: 'result',
+        title: {
+          ru: 'Полихлортрифторэтилен (CTFE)',
+          en: 'Polychlorotrifluoroethylene (CTFE)'
+        },
+        description: {
+          ru: 'Не поддерживает горение и даёт вязкий расплав.',
+          en: 'Does not sustain burning and yields a viscous melt.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'CTFE',
+              en: 'CTFE'
+            },
+            flame: {
+              ru: 'Не горит',
+              en: 'Does not burn'
+            },
+            odour: {
+              ru: 'Отсутствует',
+              en: 'None'
+            },
+            speed: {
+              ru: 'Не горит',
+              en: 'Does not burn'
+            },
+            other: {
+              ru: 'При нагреве образует вязкие нити',
+              en: 'Forms viscous strands when heated'
+            }
+          }
+        ]
+      },
+      fluoro_polymers: {
+        type: 'result',
+        title: {
+          ru: 'Фторполимеры (PTFE, FEP и др.)',
+          en: 'Fluoropolymers (PTFE, FEP, etc.)'
+        },
+        description: {
+          ru: 'Материал не поддерживает пламя и практически не плавится.',
+          en: 'Does not sustain flame and barely melts.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'PTFE / FEP / другие фторполимеры',
+              en: 'PTFE / FEP / other fluoropolymers'
+            },
+            flame: {
+              ru: 'Не горит',
+              en: 'Does not burn'
+            },
+            odour: {
+              ru: 'Отсутствует',
+              en: 'None'
+            },
+            speed: {
+              ru: 'Не горит',
+              en: 'Does not burn'
+            },
+            other: {
+              ru: 'Сохраняет форму, уголь не образуется',
+              en: 'Keeps shape, little to no charring'
+            }
+          }
+        ]
+      }
+      ,
+      flame_present: {
+        type: 'question',
+        title: {
+          ru: 'Есть пламя',
+          en: 'Flame Present'
+        },
+        text: {
+          ru: 'После удаления источника огня образец сам гаснет?',
+          en: 'Does the sample self-extinguish once the flame is removed?'
+        },
+        description: {
+          ru: 'Так мы отделяем самозатухающие материалы от тех, что продолжают гореть.',
+          en: 'This separates self-extinguishing materials from those that keep burning.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Нет, продолжает гореть',
+              en: 'No, it keeps burning'
+            },
+            next: 'continues_drips'
+          },
+          {
+            label: {
+              ru: 'Да, самозатухает',
+              en: 'Yes, it self-extinguishes'
+            },
+            next: 'self_ext_drips'
+          }
+        ]
+      },
+      continues_drips: {
+        type: 'question',
+        title: {
+          ru: 'Продолжает гореть',
+          en: 'Continues Burning'
+        },
+        text: {
+          ru: 'Во время горения образуются капли расплава?',
+          en: 'Does it form dripping melt while burning?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Да, капли появляются',
+              en: 'Yes, drips appear'
+            },
+            next: 'continues_drips_yes'
+          },
+          {
+            label: {
+              ru: 'Нет, капли не падают',
+              en: 'No, no drips'
+            },
+            next: 'continues_drips_no'
+          }
+        ]
+      },
+      continues_drips_yes: {
+        type: 'question',
+        title: {
+          ru: 'Капли при горении',
+          en: 'Drips While Burning'
+        },
+        text: {
+          ru: 'Как описать запах дыма?',
+          en: 'How would you describe the smoke odour?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Чистый запах стирола',
+              en: 'Pure styrene smell'
+            },
+            next: 'ps'
+          },
+          {
+            label: {
+              ru: 'Стирол и резина',
+              en: 'Styrene with rubber notes'
+            },
+            next: 'hips_san'
+          },
+          {
+            label: {
+              ru: 'Горький, резиновый запах',
+              en: 'Bitter, rubbery smell'
+            },
+            next: 'abs'
+          }
+        ]
+      },
+      ps: {
+        type: 'result',
+        title: {
+          ru: 'Полистирол (PS)',
+          en: 'Polystyrene (PS)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Полистирол (PS)',
+              en: 'Polystyrene (PS)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Стирол',
+              en: 'Styrene'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Густой дым с сажей',
+              en: 'Dense smoke with soot'
+            }
+          }
+        ]
+      },
+      hips_san: {
+        type: 'result',
+        title: {
+          ru: 'Ударопрочный полистирол / SAN',
+          en: 'High-impact PS / SAN'
+        },
+        description: {
+          ru: 'Оба материала дают смесь запахов стирола и резины.',
+          en: 'Both release a mix of styrene and rubber odours.'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'HIPS (ударопрочный полистирол)',
+              en: 'HIPS (high-impact polystyrene)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Стирол и резина',
+              en: 'Styrene and rubber'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          },
+          {
+            name: {
+              ru: 'SAN (сополимер стирола и акрилонитрила)',
+              en: 'SAN (styrene-acrylonitrile)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Стирол и резина',
+              en: 'Styrene and rubber'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      },
+      abs: {
+        type: 'result',
+        title: {
+          ru: 'АБС-пластик (ABS)',
+          en: 'ABS Plastic'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'ABS',
+              en: 'ABS'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Горький, резиновый',
+              en: 'Bitter, rubbery'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      },
+      continues_drips_no: {
+        type: 'question',
+        title: {
+          ru: 'Без капель',
+          en: 'No Dripping'
+        },
+        text: {
+          ru: 'Появляется ли дым при горении?',
+          en: 'Is smoke produced while burning?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Нет, дым почти отсутствует',
+              en: 'No, almost no smoke'
+            },
+            next: 'no_smoke_speed'
+          },
+          {
+            label: {
+              ru: 'Да, заметен дым с сажей',
+              en: 'Yes, noticeable sooty smoke'
+            },
+            next: 'smoke_odour'
+          }
+        ]
+      },
+      no_smoke_speed: {
+        type: 'question',
+        title: {
+          ru: 'Без дыма',
+          en: 'No Smoke'
+        },
+        text: {
+          ru: 'Как быстро горит образец?',
+          en: 'How quickly does the sample burn?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            next: 'pmma'
+          },
+          {
+            label: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            next: 'pom'
+          }
+        ]
+      },
+      pmma: {
+        type: 'result',
+        title: {
+          ru: 'Акрил (PMMA)',
+          en: 'Acrylic (PMMA)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Полиметилметакрилат (PMMA)',
+              en: 'Polymethyl methacrylate (PMMA)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Метилированные спирты',
+              en: 'Methylated spirits'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Практически без дыма',
+              en: 'Almost no smoke'
+            }
+          }
+        ]
+      },
+      pom: {
+        type: 'result',
+        title: {
+          ru: 'Полиоксиметилен (POM)',
+          en: 'Polyoxymethylene (POM)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'POM (ацеталь)',
+              en: 'POM (acetal)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Формальдегид',
+              en: 'Formaldehyde'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Практически без дыма',
+              en: 'Almost no smoke'
+            }
+          }
+        ]
+      },
+      smoke_odour: {
+        type: 'question',
+        title: {
+          ru: 'Дым с сажей',
+          en: 'Sooty Smoke'
+        },
+        text: {
+          ru: 'Какой запах ощущается?',
+          en: 'What odour do you notice?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Уксус или уксусный ангидрид',
+              en: 'Vinegar or acetic anhydride'
+            },
+            next: 'cellulosics'
+          },
+          {
+            label: {
+              ru: 'Горящая резина',
+              en: 'Burning rubber'
+            },
+            next: 'pet'
+          }
+        ]
+      },
+      cellulosics: {
+        type: 'result',
+        title: {
+          ru: 'Целлулоидные пластики',
+          en: 'Cellulosic Plastics'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Целлулоид / другие целлюлозные пластики',
+              en: 'Celluloid / other cellulosic plastics'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с искрами',
+              en: 'Yellow flame with sparks'
+            },
+            odour: {
+              ru: 'Уксус',
+              en: 'Vinegar'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Лёгкий чёрный дым с сажей',
+              en: 'Light black smoke with soot'
+            }
+          }
+        ]
+      },
+      pet: {
+        type: 'result',
+        title: {
+          ru: 'Полиэтилентерефталат (PET)',
+          en: 'Polyethylene terephthalate (PET)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'PET',
+              en: 'PET'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с голубыми краями',
+              en: 'Yellow flame with blue edges'
+            },
+            odour: {
+              ru: 'Горящая резина',
+              en: 'Burning rubber'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      }
+      ,
+      self_ext_drips: {
+        type: 'question',
+        title: {
+          ru: 'Самозатухающие термопласты',
+          en: 'Self-extinguishing Thermoplastics'
+        },
+        text: {
+          ru: 'Во время горения образуются капли расплава?',
+          en: 'Do dripping melts appear while burning?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Да, появляются',
+              en: 'Yes, there are drips'
+            },
+            next: 'self_ext_drip_smell'
+          },
+          {
+            label: {
+              ru: 'Нет, капель нет',
+              en: 'No drips'
+            },
+            next: 'self_ext_no_drips_odour'
+          }
+        ]
+      },
+      self_ext_drip_smell: {
+        type: 'question',
+        title: {
+          ru: 'Капли у самозатухающего материала',
+          en: 'Dripping, Self-extinguishing'
+        },
+        text: {
+          ru: 'Как пахнет дым?',
+          en: 'How does the smoke smell?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Прожжённые волосы или шерсть',
+              en: 'Burnt hair or wool'
+            },
+            next: 'nylon'
+          },
+          {
+            label: {
+              ru: 'Сладковатый химический запах',
+              en: 'Sweet chemical smell'
+            },
+            next: 'tpu'
+          }
+        ]
+      },
+      nylon: {
+        type: 'result',
+        title: {
+          ru: 'Полиамид (нейлон)',
+          en: 'Polyamide (Nylon)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Нейлон (PA)',
+              en: 'Nylon (PA)'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с голубым кончиком',
+              en: 'Yellow flame with blue tip'
+            },
+            odour: {
+              ru: 'Прожжённые волосы',
+              en: 'Burnt hair'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Образует капли расплава',
+              en: 'Forms dripping melt'
+            }
+          }
+        ]
+      },
+      tpu: {
+        type: 'result',
+        title: {
+          ru: 'Термопластичные полиуретаны (TPU)',
+          en: 'Thermoplastic Polyurethanes (TPU)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'TPU',
+              en: 'TPU'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Сладковатый химический запах',
+              en: 'Sweet chemical smell'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Пузыри по фронту пламени',
+              en: 'Bubbling at the flame front'
+            }
+          }
+        ]
+      },
+      self_ext_no_drips_odour: {
+        type: 'question',
+        title: {
+          ru: 'Без капель',
+          en: 'No Drips'
+        },
+        text: {
+          ru: 'Какой запах ощущается?',
+          en: 'What odour do you notice?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Запах серы',
+              en: 'Sulphur smell'
+            },
+            next: 'polysulphone'
+          },
+          {
+            label: {
+              ru: 'Запах фенола',
+              en: 'Phenolic smell'
+            },
+            next: 'phenol_branch'
+          },
+          {
+            label: {
+              ru: 'Едкий запах соляной кислоты',
+              en: 'Sharp hydrochloric acid smell'
+            },
+            next: 'pvc'
+          }
+        ]
+      },
+      polysulphone: {
+        type: 'result',
+        title: {
+          ru: 'Полисульфон (PSU)',
+          en: 'Polysulfone (PSU)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Полисульфон (PSU)',
+              en: 'Polysulfone (PSU)'
+            },
+            flame: {
+              ru: 'Оранжевое пламя',
+              en: 'Orange flame'
+            },
+            odour: {
+              ru: 'Запах серы',
+              en: 'Sulphur odour'
+            },
+            speed: {
+              ru: 'Быстро',
+              en: 'Fast'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      },
+      phenol_branch: {
+        type: 'question',
+        title: {
+          ru: 'Запах фенола',
+          en: 'Phenolic Odour'
+        },
+        text: {
+          ru: 'Обратите внимание на дополнительные признаки.',
+          en: 'Look for additional signs.'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            },
+            next: 'polycarbonate'
+          },
+          {
+            label: {
+              ru: 'Материал трудно воспламенить',
+              en: 'Hard to ignite'
+            },
+            next: 'ppe'
+          }
+        ]
+      },
+      polycarbonate: {
+        type: 'result',
+        title: {
+          ru: 'Поликарбонат (PC)',
+          en: 'Polycarbonate (PC)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Поликарбонат (PC)',
+              en: 'Polycarbonate (PC)'
+            },
+            flame: {
+              ru: 'Оранжево-жёлтое пламя',
+              en: 'Orange-yellow flame'
+            },
+            odour: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      },
+      ppe: {
+        type: 'result',
+        title: {
+          ru: 'Полифениленовый эфир (PPE)',
+          en: 'Polyphenylene Ether (PPE)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'PPE',
+              en: 'PPE'
+            },
+            flame: {
+              ru: 'Оранжево-жёлтое пламя',
+              en: 'Orange-yellow flame'
+            },
+            odour: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Очень трудно воспламенить',
+              en: 'Difficult to ignite'
+            }
+          }
+        ]
+      },
+      pvc: {
+        type: 'result',
+        title: {
+          ru: 'Поливинилхлорид (PVC)',
+          en: 'Polyvinyl Chloride (PVC)'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'PVC',
+              en: 'PVC'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с зеленоватыми краями',
+              en: 'Yellow flame with green edges'
+            },
+            odour: {
+              ru: 'Соляная кислота',
+              en: 'Hydrochloric acid'
+            },
+            speed: {
+              ru: 'Медленно',
+              en: 'Slow'
+            },
+            other: {
+              ru: 'Белый едкий дым, самозатухает',
+              en: 'White acrid smoke, self-extinguishes'
+            }
+          }
+        ]
+      },
+      thermoset_burn: {
+        type: 'question',
+        title: {
+          ru: 'Термореактивный пластик',
+          en: 'Thermosetting Plastic'
+        },
+        text: {
+          ru: 'При сжигании небольшого образца он самозатухает или продолжает гореть?',
+          en: 'When burning a small sample, does it self-extinguish or keep burning?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Самозатухает',
+              en: 'Self-extinguishes'
+            },
+            next: 'thermoset_self_smell'
+          },
+          {
+            label: {
+              ru: 'Продолжает гореть',
+              en: 'Continues to burn'
+            },
+            next: 'thermoset_cont_smell'
+          }
+        ]
+      },
+      thermoset_self_smell: {
+        type: 'question',
+        title: {
+          ru: 'Самозатухающие термореактивные пластики',
+          en: 'Self-extinguishing Thermosets'
+        },
+        text: {
+          ru: 'Какой запах ощущается?',
+          en: 'What odour do you notice?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Рыбный запах',
+              en: 'Fish-like smell'
+            },
+            next: 'melamine'
+          },
+          {
+            label: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            next: 'phenol_formaldehyde'
+          },
+          {
+            label: {
+              ru: 'Формальдегид',
+              en: 'Formaldehyde'
+            },
+            next: 'urea_formaldehyde'
+          }
+        ]
+      },
+      melamine: {
+        type: 'result',
+        title: {
+          ru: 'Меламиноформальдегид',
+          en: 'Melamine Formaldehyde'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Melamine Formaldehyde',
+              en: 'Melamine Formaldehyde'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с голубым кончиком',
+              en: 'Yellow flame with blue tip'
+            },
+            odour: {
+              ru: 'Рыбный',
+              en: 'Fish-like'
+            },
+            speed: {
+              ru: 'Самозатухает',
+              en: 'Self-extinguishing'
+            },
+            other: {
+              ru: 'Разбухает и трескается',
+              en: 'Swells and cracks'
+            }
+          }
+        ]
+      },
+      phenol_formaldehyde: {
+        type: 'result',
+        title: {
+          ru: 'Фенолформальдегид',
+          en: 'Phenol Formaldehyde'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Phenol Formaldehyde',
+              en: 'Phenol Formaldehyde'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            speed: {
+              ru: 'Самозатухает',
+              en: 'Self-extinguishing'
+            },
+            other: {
+              ru: 'Может тлеть, поверхность темнеет',
+              en: 'May smoulder; surface darkens'
+            }
+          }
+        ]
+      },
+      urea_formaldehyde: {
+        type: 'result',
+        title: {
+          ru: 'Мочевиноформальдегид',
+          en: 'Urea Formaldehyde'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Urea Formaldehyde',
+              en: 'Urea Formaldehyde'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с зеленовато-голубой каймой',
+              en: 'Yellow flame with green-blue edge'
+            },
+            odour: {
+              ru: 'Формальдегид',
+              en: 'Formaldehyde'
+            },
+            speed: {
+              ru: 'Самозатухает',
+              en: 'Self-extinguishing'
+            },
+            other: {
+              ru: 'Разбухает и трескается',
+              en: 'Swells and cracks'
+            }
+          }
+        ]
+      },
+      thermoset_cont_smell: {
+        type: 'question',
+        title: {
+          ru: 'Термореактивные, продолжающие гореть',
+          en: 'Burning Thermosets'
+        },
+        text: {
+          ru: 'Какой запах ощущается?',
+          en: 'What odour do you notice?'
+        },
+        options: [
+          {
+            label: {
+              ru: 'Рыбный',
+              en: 'Fish-like'
+            },
+            next: 'unsaturated_polyester'
+          },
+          {
+            label: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            next: 'silicone'
+          },
+          {
+            label: {
+              ru: 'Резкий аминовый',
+              en: 'Sharp amine odour'
+            },
+            next: 'epoxy'
+          }
+        ]
+      },
+      unsaturated_polyester: {
+        type: 'result',
+        title: {
+          ru: 'Ненасыщенный полиэфир',
+          en: 'Unsaturated Polyester'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Unsaturated Polyester',
+              en: 'Unsaturated Polyester'
+            },
+            flame: {
+              ru: 'Жёлтое пламя с голубыми краями',
+              en: 'Yellow flame with blue edges'
+            },
+            odour: {
+              ru: 'Рыбный',
+              en: 'Fish-like'
+            },
+            speed: {
+              ru: 'Продолжает гореть',
+              en: 'Continues to burn'
+            },
+            other: {
+              ru: 'Чёрный дым с сажей',
+              en: 'Black smoke with soot'
+            }
+          }
+        ]
+      },
+      silicone: {
+        type: 'result',
+        title: {
+          ru: 'Силикон',
+          en: 'Silicone'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Silicone',
+              en: 'Silicone'
+            },
+            flame: {
+              ru: 'Ярко-жёлтое пламя',
+              en: 'Bright yellow flame'
+            },
+            odour: {
+              ru: 'Фенол',
+              en: 'Phenol'
+            },
+            speed: {
+              ru: 'Продолжает гореть',
+              en: 'Continues to burn'
+            },
+            other: {
+              ru: 'Дым светлый, но горение длительное',
+              en: 'Light smoke, prolonged burning'
+            }
+          }
+        ]
+      },
+      epoxy: {
+        type: 'result',
+        title: {
+          ru: 'Эпоксидная смола',
+          en: 'Epoxy Resin'
+        },
+        materials: [
+          {
+            name: {
+              ru: 'Epoxy',
+              en: 'Epoxy'
+            },
+            flame: {
+              ru: 'Жёлтое пламя',
+              en: 'Yellow flame'
+            },
+            odour: {
+              ru: 'Резкий амин',
+              en: 'Pungent amine'
+            },
+            speed: {
+              ru: 'Продолжает гореть',
+              en: 'Continues to burn'
+            },
+            other: {
+              ru: 'Чёрный дым',
+              en: 'Black smoke'
+            }
+          }
+        ]
+      }
+    };
+    const contentEl = document.getElementById('content');
+    const historyEl = document.getElementById('history');
+    const headlineEl = document.getElementById('headline');
+    const leadEl = document.getElementById('lead');
+    const mapLinkEl = document.getElementById('mapLink');
+    const sourceLinkEl = document.getElementById('classicSourceLink');
+    const langSwitcher = document.querySelector('.lang-switcher');
+    const langButtons = document.querySelectorAll('.lang-button');
+
+    const browserLang = (navigator.language || navigator.userLanguage || 'en').slice(0, 2).toLowerCase();
+    const defaultLang = supportedLanguages.includes(browserLang) ? browserLang : 'en';
+
+    let currentLang = defaultLang;
+    let currentNodeId = 'start';
+    let historyStack = [];
+
+    langButtons.forEach((button) => {
+      button.addEventListener('click', () => setLanguage(button.dataset.lang));
+    });
+
+    setLanguage(currentLang, true);
+    render();
+
+    function translate(value) {
+      if (value === undefined || value === null) {
+        return '';
+      }
+      if (typeof value === 'string') {
+        return value;
+      }
+      if (typeof value === 'object') {
+        if (value[currentLang]) {
+          return value[currentLang];
+        }
+        if (value.ru) {
+          return value.ru;
+        }
+        if (value.en) {
+          return value.en;
+        }
+        const fallbackLang = supportedLanguages.find((lang) => value[lang]);
+        if (fallbackLang) {
+          return value[fallbackLang];
+        }
+      }
+      return '';
+    }
+
+    function setLanguage(lang, skipRender = false) {
+      if (!supportedLanguages.includes(lang)) {
+        lang = 'en';
+      }
+      currentLang = lang;
+      document.documentElement.lang = currentLang;
+      document.title = translate(uiText.pageTitle);
+      headlineEl.textContent = translate(uiText.heading);
+      leadEl.textContent = translate(uiText.lead);
+      if (mapLinkEl) {
+        mapLinkEl.textContent = translate(uiText.mapLink);
+      }
+      if (sourceLinkEl) {
+        sourceLinkEl.textContent = translate(uiText.sourceLink);
+      }
+      langSwitcher.setAttribute('aria-label', translate(uiText.languageSwitcher));
+      renderLanguageSwitcher();
+      if (!skipRender) {
+        render();
+      }
+    }
+
+    function renderLanguageSwitcher() {
+      langButtons.forEach((button) => {
+        if (button.dataset.lang === currentLang) {
+          button.classList.add('active');
+          button.setAttribute('aria-pressed', 'true');
+        } else {
+          button.classList.remove('active');
+          button.setAttribute('aria-pressed', 'false');
+        }
+      });
+    }
+
+    function render() {
+      renderHistory();
+      const node = flow[currentNodeId];
+      contentEl.innerHTML = '';
+
+      if (!node) {
+        const error = document.createElement('p');
+        error.textContent = translate(uiText.errorLoading);
+        contentEl.appendChild(error);
+        renderActions();
+        return;
+      }
+
+      if (node.type === 'question') {
+        renderQuestion(node);
+      } else if (node.type === 'result') {
+        renderResult(node);
+      }
+
+      renderActions();
+    }
+
+    function renderQuestion(node) {
+      const titleText = translate(node.title);
+      if (titleText) {
+        const heading = document.createElement('h2');
+        heading.textContent = titleText;
+        contentEl.appendChild(heading);
+      }
+
+      const text = document.createElement('p');
+      text.className = 'question-text';
+      text.textContent = translate(node.text);
+      contentEl.appendChild(text);
+
+      const descriptionText = translate(node.description);
+      if (descriptionText) {
+        const context = document.createElement('p');
+        context.className = 'question-context';
+        context.textContent = descriptionText;
+        contentEl.appendChild(context);
+      }
+
+      const optionsWrap = document.createElement('div');
+      optionsWrap.className = 'options';
+
+      node.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'option-button';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'option-label';
+        labelSpan.textContent = translate(option.label);
+        button.appendChild(labelSpan);
+
+        const noteText = translate(option.note);
+        if (noteText) {
+          const noteSpan = document.createElement('span');
+          noteSpan.className = 'option-note';
+          noteSpan.textContent = noteText;
+          button.appendChild(noteSpan);
+        }
+
+        button.addEventListener('click', () => handleOption(index));
+        optionsWrap.appendChild(button);
+      });
+
+      contentEl.appendChild(optionsWrap);
+    }
+
+    function renderResult(node) {
+      const titleText = translate(node.title);
+      if (titleText) {
+        const heading = document.createElement('h2');
+        heading.textContent = titleText;
+        contentEl.appendChild(heading);
+      }
+
+      const descriptionText = translate(node.description);
+      if (descriptionText) {
+        const description = document.createElement('p');
+        description.className = 'question-context';
+        description.textContent = descriptionText;
+        contentEl.appendChild(description);
+      }
+
+      const list = document.createElement('div');
+      list.className = 'material-grid';
+
+      node.materials.forEach((material) => {
+        const card = document.createElement('article');
+        card.className = 'material-card';
+
+        const title = document.createElement('h3');
+        title.textContent = translate(material.name);
+        card.appendChild(title);
+
+        const flame = document.createElement('p');
+        flame.className = 'material-prop';
+        flame.innerHTML = '<span>' + (currentLang === 'ru' ? 'Цвет пламени:' : 'Flame colour:') + '</span> ' + translate(material.flame);
+        card.appendChild(flame);
+
+        const odour = document.createElement('p');
+        odour.className = 'material-prop';
+        odour.innerHTML = '<span>' + (currentLang === 'ru' ? 'Запах:' : 'Odour:') + '</span> ' + translate(material.odour);
+        card.appendChild(odour);
+
+        const speed = document.createElement('p');
+        speed.className = 'material-prop';
+        speed.innerHTML = '<span>' + (currentLang === 'ru' ? 'Скорость горения:' : 'Burn rate:') + '</span> ' + translate(material.speed);
+        card.appendChild(speed);
+
+        const other = document.createElement('p');
+        other.className = 'material-prop';
+        other.innerHTML = '<span>' + (currentLang === 'ru' ? 'Другие признаки:' : 'Other traits:') + '</span> ' + translate(material.other);
+        card.appendChild(other);
+
+        list.appendChild(card);
+      });
+
+      contentEl.appendChild(list);
+    }
+
+    function renderActions() {
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      if (historyStack.length) {
+        const backBtn = document.createElement('button');
+        backBtn.type = 'button';
+        backBtn.className = 'ghost-button';
+        backBtn.textContent = translate(uiText.back);
+        backBtn.addEventListener('click', goBack);
+        actions.appendChild(backBtn);
+      }
+
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'ghost-button';
+      resetBtn.textContent = translate(uiText.reset);
+      resetBtn.addEventListener('click', resetFlow);
+      actions.appendChild(resetBtn);
+
+      contentEl.appendChild(actions);
+    }
+
+    function handleOption(optionIndex) {
+      const node = flow[currentNodeId];
+      const option = node.options[optionIndex];
+
+      historyStack.push({
+        nodeId: currentNodeId,
+        optionIndex
+      });
+
+      currentNodeId = option.next;
+      render();
+    }
+
+    function goBack() {
+      const last = historyStack.pop();
+      if (last) {
+        currentNodeId = last.nodeId;
+      } else {
+        currentNodeId = 'start';
+      }
+      render();
+    }
+
+    function resetFlow() {
+      currentNodeId = 'start';
+      historyStack = [];
+      render();
+    }
+
+    function renderHistory() {
+      historyEl.innerHTML = '';
+
+      const heading = document.createElement('h2');
+      heading.textContent = translate(uiText.historyHeading);
+      historyEl.appendChild(heading);
+
+      if (!historyStack.length) {
+        const placeholder = document.createElement('p');
+        placeholder.className = 'history-placeholder';
+        placeholder.textContent = translate(uiText.historyPlaceholder);
+        historyEl.appendChild(placeholder);
+        return;
+      }
+
+      const list = document.createElement('ol');
+      list.className = 'history-list';
+
+      historyStack.forEach((item) => {
+        const questionNode = flow[item.nodeId];
+        if (!questionNode) {
+          return;
+        }
+        const option = questionNode.options[item.optionIndex];
+        const li = document.createElement('li');
+        li.className = 'history-item';
+
+        const questionLine = document.createElement('span');
+        const titleText = translate(questionNode.title);
+        const questionText = translate(questionNode.text);
+        questionLine.textContent = titleText ? titleText + ': ' + questionText : questionText;
+        li.appendChild(questionLine);
+
+        const answerLine = document.createElement('strong');
+        answerLine.textContent = translate(uiText.answerLabel) + ' ' + translate(option.label);
+        li.appendChild(answerLine);
+
+        list.appendChild(li);
+      });
+
+      historyEl.appendChild(list);
+    }
+  </script>
+
+      <!-- Yandex.Metrika counter -->   
+<script type="text/javascript" > (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)}) (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym"); ym(16681432, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true }); </script> <noscript><div><img src="https://mc.yandex.ru/watch/16681432" style="position:absolute; left:-9999px;" alt="" /></div></noscript> 
+<!-- /Yandex.Metrika counter -->
+</body>
+</html>
+

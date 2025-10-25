@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Интерактивная карта пластиков</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+  <div class="map-shell">
+    <button type="button" class="panel-toggle" id="panelToggle" aria-controls="controlPanel" aria-expanded="true">
+      <span class="panel-toggle-icon" aria-hidden="true"></span>
+      <span id="panelToggleLabel"></span>
+    </button>
+    <div class="panel-scrim" id="panelScrim"></div>
+    <div class="floating-panel panel-controls" id="controlPanel">
+      <div>
+        <h1 id="headline"></h1>
+        <p id="lead"></p>
+      </div>
+      <div class="control-actions">
+        <div class="lang-switcher" role="group" aria-label="Language selector">
+          <button type="button" class="lang-button" data-lang="ru">Русский</button>
+          <button type="button" class="lang-button" data-lang="en">English</button>
+        </div>
+      </div>
+      <div class="control-links">
+        <a class="control-link" id="classicLink" href="classic.html">Упрощённая версия</a>
+        <a class="control-link" id="sourceLink" href="https://www.stanmech.com/articles/plastics-identification-flow-chart#:~:text=Plastics%20Identification%20Flow%20Chart%20-%20Articles,Roofing" target="_blank" rel="noopener noreferrer">Source</a>
+      </div>
+      <div class="route-console" id="historySection"></div>
+    </div>
+    <div class="floating-panel panel-progress">
+      <div class="progress-track" id="progressTrack"></div>
+      <span class="progress-label" id="progressLabel"></span>
+    </div>
+    <div class="map-actions">
+      <button type="button" class="pill-button ghost" id="backButton">Назад</button>
+      <button type="button" class="pill-button accent" id="resetButton">Начать заново</button>
+    </div>
+    <div class="map-space" id="mapSpace">
+      <div class="map-pan" id="mapPan">
+        <div class="map-canvas" id="mapCanvas">
+          <svg class="map-links" id="mapLinks" width="4200" height="4200" viewBox="0 0 4200 4200"></svg>
+          <div class="node-layer" id="flowTrack"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="assets/js/app.js"></script>
+  <script src="assets/js/vendor/yandex-metrika.js" defer></script>
+  <noscript>
+    <div><img src="https://mc.yandex.ru/watch/16681432" style="position:absolute; left:-9999px;" alt="" /></div>
+  </noscript>
+</body>
+</html>
