@@ -12,6 +12,9 @@ This directory contains a modularised version of the polymer identification tool
 2. Run `node server.js` from the project root. Override `PORT` and `HOST` if needed (for example, `PORT=8080 node server.js`).
 3. Open `http://localhost:3000` (or your chosen port) to view the map.
 
+## Live Demo
+- https://nikolaysemenov.ru/polymers/
+
 ## Customisation
 - **Styles**: Edit `assets/css/main.css` to tweak layout, theming, or responsive rules.
 - **Translations**: Extend `assets/lang/translations.js` with additional locales. Pair it with `assets/data/flow-data.js` to add translated nodes.
